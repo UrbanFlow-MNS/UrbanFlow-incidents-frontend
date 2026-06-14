@@ -1,5 +1,7 @@
 import { Routes, Route } from 'react-router-dom'
 import { Layout } from '@/components/layout/Layout'
+import { AuthGuard } from '@/components/auth/AuthGuard'
+import DashboardPage from '@/pages/DashboardPage'
 
 function PlaceholderPage({ title, description }: { title: string; description: string }) {
   return (
@@ -12,13 +14,15 @@ function PlaceholderPage({ title, description }: { title: string; description: s
 
 function App() {
   return (
+    <AuthGuard>
     <Routes>
       <Route element={<Layout />}>
-        <Route index element={<PlaceholderPage title="Dashboard" description="La page d'accueil, on verra les stats et les incidents récents ici" />} />
+        <Route index element={<DashboardPage />} />
         <Route path="incidents" element={<PlaceholderPage title="Incidents" description="La liste des incidents, avec des filtres et tout" />} />
         <Route path="incidents/new" element={<PlaceholderPage title="Nouvel incident" description="Le formulaire pour créer un incident, à faire" />} />
       </Route>
     </Routes>
+    </AuthGuard>
   )
 }
 
