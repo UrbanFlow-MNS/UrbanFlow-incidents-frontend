@@ -7,6 +7,9 @@ WORKDIR /app
 ARG VITE_API_URL=http://localhost:4000
 ENV VITE_API_URL=$VITE_API_URL
 
+ARG VITE_AUTH_URL=http://localhost:5173
+ENV VITE_AUTH_URL=$VITE_AUTH_URL
+
 COPY package*.json ./
 RUN npm ci
 
