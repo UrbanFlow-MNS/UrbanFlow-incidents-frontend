@@ -1,0 +1,35 @@
+import type { ReactNode } from 'react'
+import { getCurrentUserId } from '@/lib/apiClient'
+
+const AUTH_URL = import.meta.env.VITE_AUTH_URL ?? 'http://localhost:5173'
+
+function parseHashTokens() {
+  const hash = window.location.hash.startsWith('#')
+    ? window.location.hash.slice(1)
+    : window.location.hash
+  if (!hash) return
+
+  const params = new URLSearchParams(hash)
+  const token = params.get('token')
+  const refresh = params.get('refresh')
+  if (!token) return
+
+  localStorage.setItem('uf_token', token)
+  if (refresh) localStorage.setItem('uf_refresh', refresh)
+  window.history.replaceState(null, '', window.location.pathname + window.location.search)
+}
+
+interface Props {
+  children: ReactNode
+}
+
+export function AuthGuard({ children }: Props) {
+  parseHashTokens()
+
+  if (!getCurrentUserId()) {
+    const redirect = encodeURIComponent(window.location.href)
+    window.location.href = `${AUTH_URL}/login?app=incident&redirect=${redirect}`
+    return null
+  }
+  return <>{children}</>
+}
