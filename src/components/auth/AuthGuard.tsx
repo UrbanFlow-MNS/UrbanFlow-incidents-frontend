@@ -1,8 +1,6 @@
 import type { ReactNode } from "react";
 import { getCurrentUserId } from "@/lib/apiClient";
 
-const AUTH_URL = "https://auth.urbanflow.lazyy.fr";
-
 function parseHashTokens() {
     const hash = window.location.hash.startsWith("#")
         ? window.location.hash.slice(1)
@@ -32,7 +30,7 @@ export function AuthGuard({ children }: Props) {
 
     if (!getCurrentUserId()) {
         const redirect = encodeURIComponent(window.location.href);
-        window.location.href = `${AUTH_URL}/login?app=incident&redirect=${redirect}`;
+        window.location.href = `https://auth.urbanflow.lazyy.fr/login?app=incident&redirect=${redirect}`;
         return null;
     }
     return <>{children}</>;
