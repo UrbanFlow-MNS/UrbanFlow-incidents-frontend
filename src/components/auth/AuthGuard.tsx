@@ -28,6 +28,10 @@ interface Props {
 export function AuthGuard({ children }: Props) {
     parseHashTokens();
 
+    if (import.meta.env.VITE_SKIP_AUTH === 'true') {
+        return <>{children}</>;
+    }
+
     if (!getCurrentUserId()) {
         const redirect = encodeURIComponent(window.location.href);
         window.location.href = `https://auth.urbanflow.lazyy.fr/login?app=incident&redirect=${redirect}`;
