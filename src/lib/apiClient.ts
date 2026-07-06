@@ -25,6 +25,9 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   })
 
   if (res.status === 401) {
+    if (import.meta.env.DEV && import.meta.env.VITE_SKIP_AUTH === 'true') {
+      throw new Error('Unauthorized')
+    }
     const redirect = encodeURIComponent(window.location.href)
     window.location.href = `${AUTH_URL}/login?app=incident&redirect=${redirect}`
     throw new Error('Unauthorized')

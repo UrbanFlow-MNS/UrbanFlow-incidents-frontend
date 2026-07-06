@@ -89,32 +89,34 @@ export default function DashboardPage() {
         ) : recent.length === 0 ? (
           <div className="px-6 py-8 text-sm text-muted-foreground text-center">Aucun incident pour l'instant.</div>
         ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border bg-secondary/40">
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground">Code</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground">Titre</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground">Priorité</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground">Statut</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground">Créé le</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {recent.map(incident => (
-                <tr
-                  key={incident.id}
-                  onClick={() => navigate(`/incidents/${incident.id}`)}
-                  className="cursor-pointer hover:bg-secondary/40 transition-colors"
-                >
-                  <td className="px-6 py-3 font-mono text-xs text-muted-foreground">{incident.code}</td>
-                  <td className="px-6 py-3 font-medium text-foreground">{incident.title}</td>
-                  <td className="px-6 py-3"><PriorityBadge priority={incident.priority} /></td>
-                  <td className="px-6 py-3"><StatusBadge status={incident.status} /></td>
-                  <td className="px-6 py-3 text-muted-foreground">{formatDate(incident.createdAt)}</td>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border bg-secondary/40">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground">Code</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground">Titre</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground">Priorité</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground">Statut</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground">Créé le</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {recent.map(incident => (
+                  <tr
+                    key={incident.id}
+                    onClick={() => navigate(`/incidents/${incident.id}`)}
+                    className="cursor-pointer hover:bg-secondary/40 transition-colors"
+                  >
+                    <td className="px-6 py-3 font-mono text-xs text-muted-foreground">{incident.code}</td>
+                    <td className="px-6 py-3 font-medium text-foreground">{incident.title}</td>
+                    <td className="px-6 py-3"><PriorityBadge priority={incident.priority} /></td>
+                    <td className="px-6 py-3"><StatusBadge status={incident.status} /></td>
+                    <td className="px-6 py-3 text-muted-foreground">{formatDate(incident.createdAt)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>

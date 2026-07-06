@@ -28,7 +28,7 @@ interface Props {
 export function AuthGuard({ children }: Props) {
     parseHashTokens();
 
-    if (import.meta.env.VITE_SKIP_AUTH === 'true') {
+    if (import.meta.env.DEV && import.meta.env.VITE_SKIP_AUTH === 'true') {
         return <>{children}</>;
     }
 

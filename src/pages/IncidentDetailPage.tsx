@@ -150,7 +150,7 @@ export default function IncidentDetailPage() {
         </div>
       )}
 
-      <form onSubmit={handleSave} className="rounded-2xl border border-border bg-card px-8 py-7 space-y-5">
+      <form onSubmit={handleSave} className="rounded-2xl border border-border bg-card px-5 py-7 sm:px-8 space-y-5">
         <div>
           <FieldLabel>Titre</FieldLabel>
           <Input
@@ -170,7 +170,7 @@ export default function IncidentDetailPage() {
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <div>
             <FieldLabel>Site</FieldLabel>
             <Select value={form.siteId} onChange={e => set('siteId', e.target.value)}>
@@ -191,7 +191,7 @@ export default function IncidentDetailPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
           <div>
             <FieldLabel>Priorité</FieldLabel>
             <Select value={form.priority} onChange={e => set('priority', e.target.value as IncidentPriority)}>
@@ -221,7 +221,7 @@ export default function IncidentDetailPage() {
           </div>
         </div>
 
-        <div className="flex items-center justify-between pt-2">
+        <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
           <Button
             type="button"
             variant="ghost"
@@ -238,10 +238,11 @@ export default function IncidentDetailPage() {
               variant="outline"
               onClick={() => navigate('/incidents')}
               disabled={isSaving}
+              className="flex-1 sm:flex-none"
             >
               Annuler
             </Button>
-            <Button type="submit" disabled={isSaving || isDeleting}>
+            <Button type="submit" disabled={isSaving || isDeleting} className="flex-1 sm:flex-none">
               {isSaving ? <><Loader2 size={15} className="animate-spin" /> Enregistrement…</> : 'Enregistrer'}
             </Button>
           </div>

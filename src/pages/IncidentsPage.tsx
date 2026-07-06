@@ -66,8 +66,8 @@ export default function IncidentsPage() {
         </div>
       )}
 
-      <div className="flex gap-3">
-        <div className="relative flex-1 max-w-xs">
+      <div className="flex flex-col gap-3 sm:flex-row">
+        <div className="relative flex-1 sm:max-w-xs">
           <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Rechercher…"
@@ -79,7 +79,7 @@ export default function IncidentsPage() {
         <Select
           value={statusFilter}
           onChange={e => setStatusFilter(e.target.value as IncidentStatus | '')}
-          className="w-40"
+          className="sm:w-40"
         >
           <option value="">Tous les statuts</option>
           <option value="OPEN">Ouvert</option>
@@ -90,7 +90,7 @@ export default function IncidentsPage() {
         <Select
           value={priorityFilter}
           onChange={e => setPriorityFilter(e.target.value as IncidentPriority | '')}
-          className="w-40"
+          className="sm:w-40"
         >
           <option value="">Toutes priorités</option>
           <option value="LOW">Faible</option>
@@ -108,36 +108,38 @@ export default function IncidentsPage() {
             {incidents.length === 0 ? 'Aucun incident pour l\'instant.' : 'Aucun résultat pour ces filtres.'}
           </div>
         ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border bg-secondary/40">
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground">Code</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground">Titre</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground">Catégorie</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground">Site</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground">Priorité</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground">Statut</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground">Créé le</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {filtered.map(incident => (
-                <tr
-                  key={incident.id}
-                  onClick={() => navigate(`/incidents/${incident.id}`)}
-                  className="cursor-pointer hover:bg-secondary/40 transition-colors"
-                >
-                  <td className="px-6 py-3 font-mono text-xs text-muted-foreground">{incident.code}</td>
-                  <td className="px-6 py-3 font-medium text-foreground">{incident.title}</td>
-                  <td className="px-6 py-3 text-muted-foreground">{incident.category?.name ?? '—'}</td>
-                  <td className="px-6 py-3 text-muted-foreground">{incident.site?.name ?? '—'}</td>
-                  <td className="px-6 py-3"><PriorityBadge priority={incident.priority} /></td>
-                  <td className="px-6 py-3"><StatusBadge status={incident.status} /></td>
-                  <td className="px-6 py-3 text-muted-foreground">{formatDate(incident.createdAt)}</td>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border bg-secondary/40">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground">Code</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground">Titre</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground">Catégorie</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground">Site</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground">Priorité</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground">Statut</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground">Créé le</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {filtered.map(incident => (
+                  <tr
+                    key={incident.id}
+                    onClick={() => navigate(`/incidents/${incident.id}`)}
+                    className="cursor-pointer hover:bg-secondary/40 transition-colors"
+                  >
+                    <td className="px-6 py-3 font-mono text-xs text-muted-foreground">{incident.code}</td>
+                    <td className="px-6 py-3 font-medium text-foreground">{incident.title}</td>
+                    <td className="px-6 py-3 text-muted-foreground">{incident.category?.name ?? '—'}</td>
+                    <td className="px-6 py-3 text-muted-foreground">{incident.site?.name ?? '—'}</td>
+                    <td className="px-6 py-3"><PriorityBadge priority={incident.priority} /></td>
+                    <td className="px-6 py-3"><StatusBadge status={incident.status} /></td>
+                    <td className="px-6 py-3 text-muted-foreground">{formatDate(incident.createdAt)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>

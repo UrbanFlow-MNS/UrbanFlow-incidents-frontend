@@ -114,8 +114,8 @@ export default function NewIncidentPage() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="rounded-2xl border border-border bg-card px-8 py-7 space-y-5">
-        <div className="grid grid-cols-2 gap-5">
+      <form onSubmit={handleSubmit} className="rounded-2xl border border-border bg-card px-5 py-7 sm:px-8 space-y-5">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <div>
             <FieldLabel required>Code</FieldLabel>
             <Input
@@ -157,7 +157,7 @@ export default function NewIncidentPage() {
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <div>
             <FieldLabel required>Site</FieldLabel>
             <Select
@@ -186,7 +186,7 @@ export default function NewIncidentPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
           <div>
             <FieldLabel required>Priorité</FieldLabel>
             <Select value={form.priority} onChange={e => set('priority', e.target.value as IncidentPriority)}>
@@ -216,7 +216,7 @@ export default function NewIncidentPage() {
           </div>
         </div>
 
-        <div className="flex justify-end gap-3 pt-2">
+        <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
           <Button
             type="button"
             variant="outline"
