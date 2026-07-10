@@ -5,6 +5,8 @@ import DashboardPage from '@/pages/DashboardPage'
 import IncidentsPage from '@/pages/IncidentsPage'
 import NewIncidentPage from '@/pages/NewIncidentPage'
 import IncidentDetailPage from '@/pages/IncidentDetailPage'
+import SitesPage from '@/pages/SitesPage'
+import NewSitePage from '@/pages/NewSitePage'
 
 function App() {
   return (
@@ -15,6 +17,8 @@ function App() {
           <Route path="incidents" element={<IncidentsPage />} />
           <Route path="incidents/new" element={<NewIncidentPage />} />
           <Route path="incidents/:id" element={<IncidentDetailPage />} />
+          <Route path="sites" element={<SitesPage />} />
+          <Route path="sites/new" element={<NewSitePage />} />
         </Route>
       </Routes>
     </AuthGuard>

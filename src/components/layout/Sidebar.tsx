@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, AlertTriangle, PlusCircle } from 'lucide-react'
+import { LayoutDashboard, AlertTriangle, PlusCircle, MapPin } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import logo from '@/assets/logo.png'
 
@@ -7,6 +7,7 @@ const nav = [
   { to: '/',              icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/incidents',     icon: AlertTriangle,   label: 'Incidents' },
   { to: '/incidents/new', icon: PlusCircle,      label: 'Nouvel incident' },
+  { to: '/sites',         icon: MapPin,          label: 'Sites' },
 ]
 
 interface Props {

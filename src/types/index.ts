@@ -54,3 +54,14 @@ export interface CreateIncidentDto {
 }
 
 export type UpdateIncidentDto = Partial<CreateIncidentDto>
+
+export interface CreateSiteDto {
+  name: string
+  address: string
+  city: string
+  zipcode: string
+  latitude: number
+  longitude: number
+  contactName?: string
+  contactPhone?: string
+}

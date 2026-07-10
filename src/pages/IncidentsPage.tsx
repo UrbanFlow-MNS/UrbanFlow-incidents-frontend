@@ -6,7 +6,7 @@ import { StatusBadge, PriorityBadge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
-import type { Incident, IncidentStatus, IncidentPriority } from '@/types'
+import type { Incident, IncidentStatus, IncidentPriority, Site } from '@/types'
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('fr-FR', {
@@ -24,18 +24,22 @@ export default function IncidentsPage() {
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<IncidentStatus | ''>('')
   const [priorityFilter, setPriorityFilter] = useState<IncidentPriority | ''>('')
+  const [siteFilter, setSiteFilter] = useState('')
+  const [sites, setSites] = useState<Site[]>([])
 
   useEffect(() => {
-    
+
     apiClient.incidents.findAll()
       .then(setIncidents)
       .catch((e: Error) => setError(e.message))
       .finally(() => setLoading(false))
+    apiClient.sites.findAll().then(setSites).catch(() => {})
   }, [])
 
   const filtered = incidents.filter(incident => {
     if (statusFilter && incident.status !== statusFilter) return false
     if (priorityFilter && incident.priority !== priorityFilter) return false
+    if (siteFilter && incident.siteId !== Number(siteFilter)) return false
     if (search) {
       const q = search.toLowerCase()
       return (
@@ -97,6 +101,16 @@ export default function IncidentsPage() {
           <option value="MEDIUM">Moyen</option>
           <option value="HIGH">Élevé</option>
           <option value="URGENT">Urgent</option>
+        </Select>
+        <Select
+          value={siteFilter}
+          onChange={e => setSiteFilter(e.target.value)}
+          className="sm:w-40"
+        >
+          <option value="">Tous les sites</option>
+          {sites.map(s => (
+            <option key={s.id} value={s.id}>{s.name}</option>
+          ))}
         </Select>
       </div>
 

@@ -63,5 +63,10 @@ export const apiClient = {
   },
   sites: {
     findAll: () => request<import('@/types').Site[]>('/sites'),
+    create: (dto: import('@/types').CreateSiteDto) =>
+      request<import('@/types').Site>('/sites', {
+        method: 'POST',
+        body: JSON.stringify(dto),
+      }),
   },
 }
