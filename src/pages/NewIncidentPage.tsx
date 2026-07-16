@@ -5,7 +5,7 @@ import { apiClient, getCurrentUserId } from '@/lib/apiClient'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
-import type { Category, Site, IncidentStatus, IncidentPriority } from '@/types'
+import type { Category, Site, TripRoute, IncidentStatus, IncidentPriority } from '@/types'
 
 interface FormState {
   code: string
@@ -17,6 +17,7 @@ interface FormState {
   categoryId: string
   status: IncidentStatus
   priority: IncidentPriority
+  affectedRouteIds: number[]
 }
 
 function FieldLabel({ children, required }: { children: React.ReactNode; required?: boolean }) {
@@ -33,6 +34,7 @@ export default function NewIncidentPage() {
   const userId = getCurrentUserId()
   const [categories, setCategories] = useState<Category[]>([])
   const [sites, setSites] = useState<Site[]>([])
+  const [routes, setRoutes] = useState<TripRoute[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -46,19 +48,30 @@ export default function NewIncidentPage() {
     categoryId: '',
     status: 'OPEN',
     priority: 'MEDIUM',
+    affectedRouteIds: [],
   })
 
   useEffect(() => {
-    Promise.all([apiClient.categories.findAll(), apiClient.sites.findAll()])
-      .then(([cats, sites]) => {
+    Promise.all([apiClient.categories.findAll(), apiClient.sites.findAll(), apiClient.routes.findAll()])
+      .then(([cats, sites, routes]) => {
         setCategories(cats)
         setSites(sites)
+        setRoutes(routes)
       })
       .catch(() => {})
   }, [])
 
   function set(field: keyof FormState, value: string) {
     setForm(f => ({ ...f, [field]: value }))
+  }
+
+  function toggleRoute(routeId: number) {
+    setForm(f => ({
+      ...f,
+      affectedRouteIds: f.affectedRouteIds.includes(routeId) 
+      ? f.affectedRouteIds.filter(id => id !== routeId) 
+      : [...f.affectedRouteIds, routeId],
+    }))
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -84,6 +97,7 @@ export default function NewIncidentPage() {
         status: form.status,
         priority: form.priority,
         createdBy: userId!,
+        affectedRouteIds: form.affectedRouteIds,
       })
       navigate(`/incidents/${incident.id}`)
     } catch (e: unknown) {
@@ -214,6 +228,28 @@ export default function NewIncidentPage() {
               required
             />
           </div>
+        </div>
+
+        <div>
+          <FieldLabel>Lignes affectées</FieldLabel>
+          {routes.length === 0 ? (
+            <p className="text-sm text-muted-foreground">Aucune ligne disponible.</p>
+          ) : (
+            <div className="max-h-40 overflow-y-auto rounded-xl border border-input bg-[hsl(0_0%_98%)] p-3 space-y-2">
+              {routes.map(route => (
+                <label key={route.routeId} className="flex items-center gap-2 text-sm cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={form.affectedRouteIds.includes(route.routeId)}
+                    onChange={() => toggleRoute(route.routeId)}
+                    className="rounded border-input"
+                  />
+                  {route.routeShortName ? `${route.routeShortName} — ` : ''}
+                  {route.routeLongName ?? `Ligne #${route.routeId}`}
+                </label>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
