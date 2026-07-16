@@ -69,4 +69,7 @@ export const apiClient = {
         body: JSON.stringify(dto),
       }),
   },
+  routes: {
+    findAll: () => request<import('@/types').TripRoute[]>('/routes/all'),
+  },
 }

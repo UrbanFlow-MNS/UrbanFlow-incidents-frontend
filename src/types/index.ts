@@ -21,6 +21,14 @@ export interface Site {
   updatedAt: string
 }
 
+export interface TripRoute {
+  routeId: number
+  agencyId: number
+  routeTypeName: string
+  routeShortName?: string
+  routeLongName?: string
+}
+
 export interface Incident {
   id: number
   code: string
@@ -38,6 +46,7 @@ export interface Incident {
   categoryId: number
   category?: Category
   createdBy: number
+  affectedRouteIds: number[]
 }
 
 export interface CreateIncidentDto {
@@ -51,6 +60,7 @@ export interface CreateIncidentDto {
   status: IncidentStatus
   priority: IncidentPriority
   createdBy: number
+  affectedRouteIds?: number[]
 }
 
 export type UpdateIncidentDto = Partial<CreateIncidentDto>

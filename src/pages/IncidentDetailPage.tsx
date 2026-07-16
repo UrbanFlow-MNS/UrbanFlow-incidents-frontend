@@ -6,7 +6,7 @@ import { StatusBadge, PriorityBadge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
-import type { Category, Incident, IncidentStatus, IncidentPriority, Site } from '@/types'
+import type { Category, Incident, IncidentStatus, IncidentPriority, Site, TripRoute } from '@/types'
 
 function FieldLabel({ children }: { children: React.ReactNode }) {
   return (
@@ -21,6 +21,7 @@ export default function IncidentDetailPage() {
   const [incident, setIncident] = useState<Incident | null>(null)
   const [categories, setCategories] = useState<Category[]>([])
   const [sites, setSites] = useState<Site[]>([])
+  const [routes, setRoutes] = useState<TripRoute[]>([])
   const [loading, setLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
@@ -35,6 +36,7 @@ export default function IncidentDetailPage() {
     categoryId: '',
     status: '' as IncidentStatus,
     priority: '' as IncidentPriority,
+    affectedRouteIds: [] as number[],
   })
 
   useEffect(() => {
@@ -43,11 +45,13 @@ export default function IncidentDetailPage() {
       apiClient.incidents.findOne(parseInt(id, 10)),
       apiClient.categories.findAll(),
       apiClient.sites.findAll(),
+      apiClient.routes.findAll(),
     ])
-      .then(([inc, cats, s]) => {
+      .then(([inc, cats, s, r]) => {
         setIncident(inc)
         setCategories(cats)
         setSites(s)
+        setRoutes(r)
         setForm({
           title: inc.title,
           description: inc.description,
@@ -56,14 +60,25 @@ export default function IncidentDetailPage() {
           categoryId: String(inc.categoryId),
           status: inc.status,
           priority: inc.priority,
+          affectedRouteIds: inc.affectedRouteIds ?? [],
         })
       })
       .catch((e: Error) => setError(e.message))
       .finally(() => setLoading(false))
   }, [id])
 
-  function set(field: keyof typeof form, value: string) {
+  function set(field: keyof Omit<typeof form, 'affectedRouteIds'>, value: string) {
     setForm(f => ({ ...f, [field]: value }))
+    setSuccess(false)
+  }
+
+  function toggleRoute(routeId: number) {
+    setForm(f => ({
+      ...f,
+      affectedRouteIds: f.affectedRouteIds.includes(routeId)
+        ? f.affectedRouteIds.filter(id => id !== routeId)
+        : [...f.affectedRouteIds, routeId],
+    }))
     setSuccess(false)
   }
 
@@ -81,6 +96,7 @@ export default function IncidentDetailPage() {
         categoryId: parseInt(form.categoryId, 10),
         status: form.status,
         priority: form.priority,
+        affectedRouteIds: form.affectedRouteIds,
       })
       setIncident(updated)
       setSuccess(true)
@@ -219,6 +235,28 @@ export default function IncidentDetailPage() {
               onChange={e => set('estimateDuration', e.target.value)}
             />
           </div>
+        </div>
+
+        <div>
+          <FieldLabel>Lignes affectées</FieldLabel>
+          {routes.length === 0 ? (
+            <p className="text-sm text-muted-foreground">Aucune ligne disponible.</p>
+          ) : (
+            <div className="max-h-40 overflow-y-auto rounded-xl border border-input bg-[hsl(0_0%_98%)] p-3 space-y-2">
+              {routes.map(route => (
+                <label key={route.routeId} className="flex items-center gap-2 text-sm cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={form.affectedRouteIds.includes(route.routeId)}
+                    onChange={() => toggleRoute(route.routeId)}
+                    className="rounded border-input"
+                  />
+                  {route.routeShortName ? `${route.routeShortName} — ` : ''}
+                  {route.routeLongName ?? `Ligne #${route.routeId}`}
+                </label>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
