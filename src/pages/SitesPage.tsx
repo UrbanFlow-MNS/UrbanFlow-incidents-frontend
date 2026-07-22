@@ -4,21 +4,31 @@ import { Plus, Search } from 'lucide-react'
 import { apiClient } from '@/lib/apiClient'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import type { Site } from '@/types'
+import { cn } from '@/lib/utils'
+import type { Incident, Site } from '@/types'
 
 export default function SitesPage() {
   const navigate = useNavigate()
   const [sites, setSites] = useState<Site[]>([])
+  const [incidents, setIncidents] = useState<Incident[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
 
   useEffect(() => {
-    apiClient.sites.findAll()
-      .then(setSites)
+    Promise.all([apiClient.sites.findAll(), apiClient.incidents.findAll()])
+      .then(([sites, incidents]) => {
+        setSites(sites)
+        setIncidents(incidents)
+      })
       .catch((e: Error) => setError(e.message))
       .finally(() => setLoading(false))
   }, [])
+
+  const incidentCountBySite = incidents.reduce<Record<number, number>>((acc, incident) => {
+    acc[incident.siteId] = (acc[incident.siteId] ?? 0) + 1
+    return acc
+  }, {})
 
   const filtered = sites.filter(site => {
     if (!search) return true
@@ -71,17 +81,31 @@ export default function SitesPage() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground">Adresse</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground">Ville</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground">Contact</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground">Incidents</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {filtered.map(site => (
-                  <tr key={site.id} className="hover:bg-secondary/40 transition-colors">
-                    <td className="px-6 py-3 font-medium text-foreground">{site.name}</td>
-                    <td className="px-6 py-3 text-muted-foreground">{site.address}</td>
-                    <td className="px-6 py-3 text-muted-foreground">{site.city}</td>
-                    <td className="px-6 py-3 text-muted-foreground">{site.contactName ?? '—'}</td>
-                  </tr>
-                ))}
+                {filtered.map(site => {
+                  const count = incidentCountBySite[site.id] ?? 0
+                  return (
+                    <tr key={site.id} className="hover:bg-secondary/40 transition-colors">
+                      <td className="px-6 py-3 font-medium text-foreground">{site.name}</td>
+                      <td className="px-6 py-3 text-muted-foreground">{site.address}</td>
+                      <td className="px-6 py-3 text-muted-foreground">{site.city}</td>
+                      <td className="px-6 py-3 text-muted-foreground">{site.contactName ?? '—'}</td>
+                      <td className="px-6 py-3">
+                        <span className={cn(
+                          'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium',
+                          count > 0
+                            ? 'bg-orange-50 text-orange-600 border-orange-100'
+                            : 'bg-neutral-100 text-neutral-500 border-neutral-200'
+                        )}>
+                          {count}
+                        </span>
+                      </td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
           </div>
