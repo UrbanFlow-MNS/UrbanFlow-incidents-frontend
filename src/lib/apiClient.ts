@@ -1,16 +1,30 @@
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:4000'
 const AUTH_URL = import.meta.env.VITE_AUTH_URL ?? 'http://localhost:5173'
 
-export function getCurrentUserId(): number | null {
+interface TokenPayload {
+  sub: number
+  role?: import('@/types').UserRole
+  exp?: number
+}
+
+function readToken(): TokenPayload | null {
   const token = localStorage.getItem('uf_token')
   if (!token) return null
   try {
-    const payload = JSON.parse(atob(token.split('.')[1])) as { sub: number; exp?: number }
+    const payload = JSON.parse(atob(token.split('.')[1])) as TokenPayload
     if (payload.exp && payload.exp * 1000 < Date.now()) return null
-    return payload.sub
+    return payload
   } catch {
     return null
   }
+}
+
+export function getCurrentUserId(): number | null {
+  return readToken()?.sub ?? null
+}
+
+export function getCurrentUserRole(): import('@/types').UserRole | null {
+  return readToken()?.role ?? null
 }
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {

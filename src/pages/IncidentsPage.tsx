@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Plus, Search } from 'lucide-react'
 import { apiClient } from '@/lib/apiClient'
+import { can } from '@/lib/permissions'
 import { StatusBadge, PriorityBadge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
@@ -58,10 +59,12 @@ export default function IncidentsPage() {
           <h1 className="text-2xl font-bold text-foreground">Incidents</h1>
           <p className="mt-1 text-sm text-muted-foreground">{incidents.length} incident{incidents.length !== 1 ? 's' : ''} au total</p>
         </div>
-        <Button onClick={() => navigate('/incidents/new')} className="gap-2">
-          <Plus size={16} />
-          Nouvel incident
-        </Button>
+        {can.createIncident() && (
+          <Button onClick={() => navigate('/incidents/new')} className="gap-2">
+            <Plus size={16} />
+            Nouvel incident
+          </Button>
+        )}
       </div>
 
       {error && (
