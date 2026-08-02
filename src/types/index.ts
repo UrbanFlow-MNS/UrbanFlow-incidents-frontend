@@ -1,6 +1,14 @@
 export type IncidentStatus = 'OPEN' | 'IN_PROGRESS' | 'RESOLVED' | 'CLOSED'
 export type IncidentPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT'
 
+export type UserRole =
+  | 'CLASSIC_USER'
+  | 'TECHNICIAN'
+  | 'ADMIN_TECHNICIAN'
+  | 'USER_CITY'
+  | 'ADMIN_USER_CITY'
+  | 'SUPERADMIN'
+
 export interface Category {
   id: number
   name: string

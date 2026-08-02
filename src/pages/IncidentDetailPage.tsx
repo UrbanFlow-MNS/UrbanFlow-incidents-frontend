@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, Loader2, Trash2 } from 'lucide-react'
 import { apiClient } from '@/lib/apiClient'
+import { can } from '@/lib/permissions'
 import { StatusBadge, PriorityBadge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -17,6 +18,7 @@ function FieldLabel({ children }: { children: React.ReactNode }) {
 export default function IncidentDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const canEdit = can.editIncident()
 
   const [incident, setIncident] = useState<Incident | null>(null)
   const [categories, setCategories] = useState<Category[]>([])
@@ -172,6 +174,7 @@ export default function IncidentDetailPage() {
           <Input
             value={form.title}
             onChange={e => set('title', e.target.value)}
+            disabled={!canEdit}
             required
           />
         </div>
@@ -182,14 +185,15 @@ export default function IncidentDetailPage() {
             value={form.description}
             onChange={e => set('description', e.target.value)}
             rows={3}
-            className="flex w-full rounded-xl border border-input bg-[hsl(0_0%_98%)] px-3 py-2 text-sm placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30 resize-none"
+            disabled={!canEdit}
+            className="flex w-full rounded-xl border border-input bg-[hsl(0_0%_98%)] px-3 py-2 text-sm placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30 resize-none disabled:cursor-not-allowed disabled:opacity-50"
           />
         </div>
 
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <div>
             <FieldLabel>Site</FieldLabel>
-            <Select value={form.siteId} onChange={e => set('siteId', e.target.value)}>
+            <Select value={form.siteId} onChange={e => set('siteId', e.target.value)} disabled={!canEdit}>
               <option value="">Sélectionner un site</option>
               {sites.map(s => (
                 <option key={s.id} value={s.id}>{s.name}</option>
@@ -198,7 +202,7 @@ export default function IncidentDetailPage() {
           </div>
           <div>
             <FieldLabel>Catégorie</FieldLabel>
-            <Select value={form.categoryId} onChange={e => set('categoryId', e.target.value)}>
+            <Select value={form.categoryId} onChange={e => set('categoryId', e.target.value)} disabled={!canEdit}>
               <option value="">Sélectionner une catégorie</option>
               {categories.filter(c => c.isActive).map(c => (
                 <option key={c.id} value={c.id}>{c.name}</option>
@@ -210,7 +214,7 @@ export default function IncidentDetailPage() {
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
           <div>
             <FieldLabel>Priorité</FieldLabel>
-            <Select value={form.priority} onChange={e => set('priority', e.target.value as IncidentPriority)}>
+            <Select value={form.priority} onChange={e => set('priority', e.target.value as IncidentPriority)} disabled={!canEdit}>
               <option value="LOW">Faible</option>
               <option value="MEDIUM">Moyen</option>
               <option value="HIGH">Élevé</option>
@@ -219,7 +223,7 @@ export default function IncidentDetailPage() {
           </div>
           <div>
             <FieldLabel>Statut</FieldLabel>
-            <Select value={form.status} onChange={e => set('status', e.target.value as IncidentStatus)}>
+            <Select value={form.status} onChange={e => set('status', e.target.value as IncidentStatus)} disabled={!canEdit}>
               <option value="OPEN">Ouvert</option>
               <option value="IN_PROGRESS">En cours</option>
               <option value="RESOLVED">Résolu</option>
@@ -233,6 +237,7 @@ export default function IncidentDetailPage() {
               min={1}
               value={form.estimateDuration}
               onChange={e => set('estimateDuration', e.target.value)}
+              disabled={!canEdit}
             />
           </div>
         </div>
@@ -249,6 +254,7 @@ export default function IncidentDetailPage() {
                     type="checkbox"
                     checked={form.affectedRouteIds.includes(route.routeId)}
                     onChange={() => toggleRoute(route.routeId)}
+                    disabled={!canEdit}
                     className="rounded border-input"
                   />
                   {route.routeShortName ? `${route.routeShortName} — ` : ''}
@@ -260,16 +266,18 @@ export default function IncidentDetailPage() {
         </div>
 
         <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={handleDelete}
-            disabled={isDeleting || isSaving}
-            className="text-destructive hover:text-destructive hover:bg-destructive/8 gap-2"
-          >
-            {isDeleting ? <Loader2 size={15} className="animate-spin" /> : <Trash2 size={15} />}
-            Supprimer
-          </Button>
+          {can.deleteIncident() ? (
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={handleDelete}
+              disabled={isDeleting || isSaving}
+              className="text-destructive hover:text-destructive hover:bg-destructive/8 gap-2"
+            >
+              {isDeleting ? <Loader2 size={15} className="animate-spin" /> : <Trash2 size={15} />}
+              Supprimer
+            </Button>
+          ) : <span />}
           <div className="flex gap-3">
             <Button
               type="button"
@@ -278,11 +286,13 @@ export default function IncidentDetailPage() {
               disabled={isSaving}
               className="flex-1 sm:flex-none"
             >
-              Annuler
+              {canEdit ? 'Annuler' : 'Retour'}
             </Button>
-            <Button type="submit" disabled={isSaving || isDeleting} className="flex-1 sm:flex-none">
-              {isSaving ? <><Loader2 size={15} className="animate-spin" /> Enregistrement…</> : 'Enregistrer'}
-            </Button>
+            {canEdit && (
+              <Button type="submit" disabled={isSaving || isDeleting} className="flex-1 sm:flex-none">
+                {isSaving ? <><Loader2 size={15} className="animate-spin" /> Enregistrement…</> : 'Enregistrer'}
+              </Button>
+            )}
           </div>
         </div>
       </form>

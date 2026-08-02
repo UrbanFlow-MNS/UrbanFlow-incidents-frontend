@@ -1,13 +1,14 @@
 import { NavLink } from 'react-router-dom'
 import { LayoutDashboard, AlertTriangle, PlusCircle, MapPin } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { can } from '@/lib/permissions'
 import logo from '@/assets/logo.png'
 
 const nav = [
-  { to: '/',              icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/incidents',     icon: AlertTriangle,   label: 'Incidents' },
-  { to: '/incidents/new', icon: PlusCircle,      label: 'Nouvel incident' },
-  { to: '/sites',         icon: MapPin,          label: 'Sites' },
+  { to: '/',              icon: LayoutDashboard, label: 'Dashboard', visible: () => true },
+  { to: '/incidents',     icon: AlertTriangle,   label: 'Incidents', visible: () => true },
+  { to: '/incidents/new', icon: PlusCircle,      label: 'Nouvel incident', visible: can.createIncident },
+  { to: '/sites',         icon: MapPin,          label: 'Sites', visible: () => true },
 ]
 
 interface Props {
@@ -29,7 +30,7 @@ export function Sidebar({ open, onClose }: Props) {
       </div>
 
       <nav className="flex flex-col gap-1">
-        {nav.map(({ to, icon: Icon, label }) => (
+        {nav.filter(item => item.visible()).map(({ to, icon: Icon, label }) => (
           <NavLink
             key={to}
             to={to}
