@@ -43,17 +43,9 @@ export default function IncidentDetailPage() {
 
   useEffect(() => {
     if (!id) return
-    Promise.all([
-      apiClient.incidents.findOne(parseInt(id, 10)),
-      apiClient.categories.findAll(),
-      apiClient.sites.findAll(),
-      apiClient.routes.findAll(),
-    ])
-      .then(([inc, cats, s, r]) => {
+    apiClient.incidents.findOne(parseInt(id, 10))
+      .then(inc => {
         setIncident(inc)
-        setCategories(cats)
-        setSites(s)
-        setRoutes(r)
         setForm({
           title: inc.title,
           description: inc.description,
@@ -67,6 +59,9 @@ export default function IncidentDetailPage() {
       })
       .catch((e: Error) => setError(e.message))
       .finally(() => setLoading(false))
+    apiClient.categories.findAll().then(setCategories).catch(() => {})
+    apiClient.sites.findAll().then(setSites).catch(() => {})
+    apiClient.routes.findAll().then(setRoutes).catch(() => {})
   }, [id])
 
   function set(field: keyof Omit<typeof form, 'affectedRouteIds'>, value: string) {
