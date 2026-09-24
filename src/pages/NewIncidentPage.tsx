@@ -52,13 +52,9 @@ export default function NewIncidentPage() {
   })
 
   useEffect(() => {
-    Promise.all([apiClient.categories.findAll(), apiClient.sites.findAll(), apiClient.routes.findAll()])
-      .then(([cats, sites, routes]) => {
-        setCategories(cats)
-        setSites(sites)
-        setRoutes(routes)
-      })
-      .catch(() => {})
+    apiClient.categories.findAll().then(setCategories).catch(() => {})
+    apiClient.sites.findAll().then(setSites).catch(() => {})
+    apiClient.routes.findAll().then(setRoutes).catch(() => {})
   }, [])
 
   function set(field: keyof FormState, value: string) {
